@@ -12,6 +12,16 @@
 - hit F5 - you will be taken to the swagger page of this API project
 - to run tests, right click on the test project and select "Run Tests"
 
+# Design considerations
+
+- impelement proper REST using verbs
+- keep controllers simple, use business logic (extensions, mappers, managers) to create reusable and well organized business logic implementation
+- keep clear separation between models and service contracts and use mappers for conversions; keep clear separation between request/response data models.
+- use design patterns like factory and DI to make code extensable, reusable and testable
+- help users with Swagger / Open API
+- document endpoints
+- use model validation, protect against SQL injections (use EF Core for instance or parameterized queries)
+
 # Demo
 
 You can find a demo instance (using SQL Server) of this API at http://foci-demo.azisoft.ca/swagger
