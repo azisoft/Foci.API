@@ -11,6 +11,7 @@
 	- for SQL Server, run the db.sql file on a SQL Server instance and then configure your connection string in appSettings.json -> "DefaultConnection" (I used SQL Server Express edition)
 - hit F5 - you will be taken to the swagger page of this API project
 - to run tests, right click on the test project and select "Run Tests"
+- docker support can be added as part of this solution by Visual Studio in project settings, and in the CI/CD pipelines, but it's not part of the solution.
 
 # Design considerations
 
