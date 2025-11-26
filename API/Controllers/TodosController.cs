@@ -15,15 +15,18 @@ public class TodosController : ControllerBase
 {
     private readonly AppDbContext _db;
 
-     public TodosController(AppDbContext db) { _db = db; }
+    public TodosController(AppDbContext db) { _db = db; }
 
     /// <summary>
-    /// Get all todos and optionally filter by title
+    /// Get all todos with optional filtering and sorting.
     /// </summary>
-    /// <param name="title"></param>
+    /// <param name="title">search by title using LIKE</param>
+    /// <param name="isCompleted">null=ALL, true=completed, false=not completed</param>
+    /// <param name="sortBy">field to sort by (title | dueDate | isCompleted)</param>
+    /// <param name="sortDir">sort direction (asc | desc)</param>
     /// <returns></returns>
     [HttpGet]
-    public async Task<ActionResult<IEnumerable<TodoResponse>>> GetAll([FromQuery] string? title = null, [FromQuery] bool? isCompleted= null)
+    public async Task<ActionResult<IEnumerable<TodoResponse>>> GetAll([FromQuery] string? title = null, [FromQuery] bool? isCompleted = null, [FromQuery] string? sortBy = "", [FromQuery] string? sortDir = "")
     {
         // build quesry
         var query = _db.Todos.AsQueryable();
@@ -36,6 +39,31 @@ public class TodosController : ControllerBase
         if (isCompleted.HasValue)
         {
             query = query.Where(todo => todo.IsCompleted == isCompleted.Value);
+        }
+
+        // apply sorting
+        if (!string.IsNullOrWhiteSpace(sortDir) && !string.IsNullOrWhiteSpace(sortBy))
+        {
+            var sortField = sortBy.Trim().ToLowerInvariant();
+            if (!new string[] { "asc", "desc" }.Contains(sortDir) || !new string[] { "title", "dueDate", "iscompleted" }.Contains(sortField))
+            {
+                // wrong sort info
+                return BadRequest("Wrong sort information");
+            }
+
+            var desc = string.Equals(sortDir, "desc", StringComparison.OrdinalIgnoreCase);
+            switch (sortField)
+            {
+                case "title":
+                    query = desc ? query.OrderByDescending(t => t.Title) : query.OrderBy(t => t.Title);
+                    break;
+                case "duedate":
+                    query = desc ? query.OrderByDescending(t => t.DueDate) : query.OrderBy(t => t.DueDate);
+                    break;
+                case "iscompleted":
+                    query = desc ? query.OrderByDescending(t => t.IsCompleted) : query.OrderBy(t => t.IsCompleted);
+                    break;
+            }
         }
 
         // run query
